@@ -39,7 +39,7 @@ export default function WhatsAppLayout() {
     const [loading, setLoading] = useState(false);
 
     const debounceTimeout = useRef(null);
-    const { myUsername, login, setLogin } = useContext(ChatContext);
+    const { myUsername, login, setLogin, clearAll } = useContext(ChatContext);
     const router = useRouter();
 
     useEffect(() => {
@@ -51,6 +51,7 @@ export default function WhatsAppLayout() {
     const logout = () => {
         localStorage.clear();
         setLogin(false)
+        clearAll()
 
 
         toast.success("Logout successfully")

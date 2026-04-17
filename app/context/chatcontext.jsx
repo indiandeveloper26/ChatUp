@@ -387,7 +387,9 @@ export const ChatProvider = ({ children }) => {
 
     const clearAll = () => {
 
-        toast.success("logout ")
+
+
+
         setMyUsername("");
         setMessages([]);
         setChatList([]);
