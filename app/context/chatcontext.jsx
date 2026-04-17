@@ -17,6 +17,7 @@ import React, { createContext, useState, useEffect, useCallback, useRef } from "
 import socket from "../socket";
 import api from "../apicall";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export const ChatContext = createContext();
 
@@ -212,14 +213,23 @@ export const ChatProvider = ({ children }) => {
 
         const callrejected = ({ by }) => {
 
+
+            toast.error(`call rejected by ${by}`);
             console.log('call reject kiya ', by)
             ruter.push(`/chatlist`);
 
         }
 
+
+
+
+
+
         const handleCallRejected = ({ by }) => {
 
             console.log("❌ Call end by:");
+
+            toast.error(`call rejected by ${by}`);
 
             setcallchek(false);
             setIncomingCall(false);
@@ -230,14 +240,14 @@ export const ChatProvider = ({ children }) => {
 
         socket.on("incoming-call", handleIncomingCall);
         socket.on("call-accepted", handleCallAccepted);
-        socket.on("call-end", handleCallRejected);
+        socket.on("call-ended", handleCallRejected);
         socket.on("call-rejected", callrejected);
         socket.on("call-error", errror);
 
         return () => {
             socket.off("incoming-call", handleIncomingCall);
             socket.off("call-accepted", handleCallAccepted);
-            socket.off("call-end", handleCallRejected);
+            socket.off("call-ended", handleCallRejected);
             socket.off("call-rejected", callrejected);
             socket.off("call-error", errror);
         };
@@ -376,6 +386,8 @@ export const ChatProvider = ({ children }) => {
     };
 
     const clearAll = () => {
+
+        toast.success("logout ")
         setMyUsername("");
         setMessages([]);
         setChatList([]);

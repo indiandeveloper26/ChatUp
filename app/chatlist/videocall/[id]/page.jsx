@@ -117,14 +117,38 @@ export default function VideoCallPage() {
     }, [socket, ROOM_ID]);
 
     const handleEndCallLocally = () => {
-        if (pc.current) {
-            pc.current.close();
-            pc.current = null;
-        }
-        // Local stream stop
+        console.log("🧹 Ending WebRTC Call...");
+
+        // 1. Stop local stream
         if (localStream) {
             localStream.getTracks().forEach(track => track.stop());
         }
+
+        // 2. Close peer connection properly
+        if (pc.current) {
+            pc.current.getSenders()?.forEach(sender => {
+                sender.track?.stop();
+            });
+
+            pc.current.close();
+            pc.current = null;
+        }
+
+        // 3. Clear video elements (IMPORTANT FIX)
+        if (localVideoRef.current) {
+            localVideoRef.current.srcObject = null;
+        }
+
+        if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = null;
+        }
+
+        // 4. Reset state (VERY IMPORTANT)
+        setLocalStream(null);
+        setRemoteStream(null);
+        setIsMuted(false);
+
+        // 5. Remove socket listeners
         socket?.off("webrtc-offer");
         socket?.off("webrtc-answer");
         socket?.off("webrtc-candidate");

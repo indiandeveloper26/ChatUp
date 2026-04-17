@@ -96,6 +96,7 @@ import WhatsApplayout from "./dummy/layoutt";
 import ClientLayout from "./component/ClientLayout";
 import WhatsAppLayout from "./component/whatsaplayout";
 import { ChatProvider } from "./context/chatcontext";
+import { ToastContainer } from "react-toastify";
 
 
 
@@ -143,7 +144,7 @@ export default function RootLayout({ children }) {
 
           <IncomingCall />
         </ChatProvider>
-
+        <ToastContainer />
 
       </body>
     </html>

@@ -4,7 +4,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ChatContext } from "../context/chatcontext";
 import api from "../apicall";
-import { User, Lock, Eye, EyeOff, Loader2, Sparkles } from "lucide-react";
+import { User, Lock, Eye, EyeOff, Loader2, Sparkles, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 
 export default function Login() {
     const [username, setUsername] = useState("");
@@ -18,8 +20,8 @@ export default function Login() {
 
     const validate = () => {
         const newErrors = {};
-        if (!username.trim()) newErrors.username = "Username humein zaroori chahiye";
-        if (!password) newErrors.password = "Password zaroori hai dost";
+        if (!username.trim()) newErrors.username = "Username zaroori hai";
+        if (!password) newErrors.password = "Password enter karein";
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -28,7 +30,7 @@ export default function Login() {
         e.preventDefault();
         if (!validate()) return;
         setLoading(true);
-        setErrors({}); // Reset general errors
+        setErrors({});
 
         try {
             const { data } = await api.post("/log", {
@@ -51,149 +53,135 @@ export default function Login() {
                 }
             }
 
+            toast.success("login successfully");
+
             setLogin(true);
             router.push("/chatlist");
         } catch (err) {
             console.error(err);
-            setErrors({ general: "Username ya Password galat hai. Phir se check karein." });
+            setErrors({ general: "Invalid Username or Password" });
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        // Deep Blue/Black Gradient with movement animation (tailwind.config update needed)
-        <div className="relative flex items-center justify-center min-h-screen overflow-hidden p-4 md:p-6 lg:p-8 bg-gradient-to-br from-slate-950 via-slate-900 to-black animate-background">
+        <div className="relative flex items-center justify-center min-h-screen bg-[#050505] overflow-hidden p-6">
 
-            {/* Absolute Decorative Glow Elements */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[160px] pointer-events-none" />
-            <div className="absolute -bottom-20 -left-20 w-[300px] h-[300px] bg-purple-600/15 rounded-full blur-[100px] pointer-events-none" />
+            {/* --- Animated Mesh Gradients --- */}
+            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px]" />
 
-            {/* Main Container - Responsive Widths */}
-            <div className="relative w-full sm:max-w-[440px] md:max-w-[480px] lg:max-w-[500px]">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="z-10 w-full max-w-[420px]"
+            >
+                {/* --- Glass Card --- */}
+                <div className="bg-[#0f0f0f]/80 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden">
 
-                {/* The Card - Modern Glassmorphism with Smooth Transitions */}
-                <div className="relative p-6 sm:p-8 md:p-10 transition-all duration-500 ease-out bg-slate-900/60 backdrop-blur-3xl border border-slate-800 rounded-3xl shadow-[0_0_60px_-10px_rgba(0,0,0,0.6)] group">
+                    {/* Glowing Top Edge */}
+                    <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
-                    {/* subtle glow border effect on hover */}
-                    <div className="absolute inset-0 rounded-3xl border border-blue-500/0 group-hover:border-blue-500/20 transition-colors duration-500 pointer-events-none" />
-
-                    {/* Header Section */}
-                    <div className="flex flex-col items-center mb-9 text-center">
-                        <div className="relative w-20 h-20 mb-5 p-1 rounded-3xl bg-slate-800/50 border border-slate-700 shadow-inner group-hover:scale-105 transition-transform duration-300">
-                            <Image
-                                src='/login.jpg' // Use your real logo path here
-                                alt="App Logo"
-                                fill
-                                className="object-cover rounded-2xl"
-                            />
-                            <div className="absolute -top-2 -right-2 p-1 bg-blue-600 rounded-full shadow-lg">
-                                <Sparkles size={14} className="text-white" />
-                            </div>
+                    {/* Logo Section */}
+                    <div className="flex flex-col items-center mb-10">
+                        <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20 mb-4 transform hover:rotate-6 transition-transform">
+                            <Sparkles className="text-white" size={30} />
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tighter text-white">
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">Welcome Back</span>
-                        </h1>
-                        <p className="text-sm md:text-base text-slate-400 mt-2 max-w-[280px]">Continue your conversations. Sign in to your account.</p>
+                        <h2 className="text-3xl font-bold text-white tracking-tight">CodeFlux Chat</h2>
+                        <p className="text-gray-500 text-sm mt-1 font-medium">Please enter your details</p>
                     </div>
 
-                    <form onSubmit={handleLogin} className="space-y-6">
-                        {/* General Error (if login fails) */}
+                    <form onSubmit={handleLogin} className="space-y-5">
                         {errors.general && (
-                            <div className="p-4 text-sm font-medium text-center text-red-300 bg-red-950/40 border border-red-800 rounded-xl animate-pulse">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs py-3 px-4 rounded-xl text-center font-medium"
+                            >
                                 {errors.general}
-                            </div>
+                            </motion.div>
                         )}
 
-                        {/* Username Input Field */}
-                        <div className="space-y-2.5">
-                            <label className="flex items-center gap-2 text-xs font-bold text-slate-300 uppercase tracking-widest ml-1">
-                                <User size={14} className="text-blue-400" />
-                                Username
-                            </label>
-                            <div className="relative">
+                        {/* Username */}
+                        <div className="space-y-2">
+                            <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest ml-1">Account ID</label>
+                            <div className="relative group">
+                                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-blue-500 transition-colors" size={18} />
                                 <input
                                     type="text"
-                                    placeholder="e.g. rahul_dev"
+                                    placeholder="Username"
                                     value={username}
-                                    onChange={(e) => {
-                                        setUsername(e.target.value);
-                                        setErrors({}); // Reset error on typing
-                                    }}
-                                    className="w-full px-5 py-4 bg-slate-800/40 border border-slate-700/80 rounded-2xl text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-600/40 focus:border-blue-500/60 transition-all shadow-inner"
+                                    onChange={(e) => { setUsername(e.target.value); setErrors({}); }}
+                                    className="w-full pl-12 pr-4 py-4 bg-white/[0.03] border border-white/5 rounded-2xl text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500/50 focus:bg-white/[0.05] transition-all"
                                 />
                             </div>
-                            {errors.username && <p className="text-red-400 text-xs ml-1 pt-1 animate-fadeIn">{errors.username}</p>}
+                            {errors.username && <p className="text-red-400 text-[10px] ml-1">{errors.username}</p>}
                         </div>
 
-                        {/* Password Input Field */}
-                        <div className="space-y-2.5">
-                            <div className="flex items-center justify-between ml-1">
-                                <label className="flex items-center gap-2 text-xs font-bold text-slate-300 uppercase tracking-widest">
-                                    <Lock size={14} className="text-blue-400" />
-                                    Password
-                                </label>
-                                <button type="button" className="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors">Forgot?</button>
+                        {/* Password */}
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center px-1">
+                                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Secret Key</label>
                             </div>
-                            <div className="relative">
+                            <div className="relative group">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-blue-500 transition-colors" size={18} />
                                 <input
                                     type={showPassword ? "text" : "password"}
-                                    placeholder="••••••••••••"
+                                    placeholder="Password"
                                     value={password}
-                                    onChange={(e) => {
-                                        setPassword(e.target.value);
-                                        setErrors({}); // Reset error on typing
-                                    }}
-                                    className="w-full px-5 py-4 bg-slate-800/40 border border-slate-700/80 rounded-2xl text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-600/40 focus:border-blue-500/60 transition-all shadow-inner"
+                                    onChange={(e) => { setPassword(e.target.value); setErrors({}); }}
+                                    className="w-full pl-12 pr-12 py-4 bg-white/[0.03] border border-white/5 rounded-2xl text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-500/50 focus:bg-white/[0.05] transition-all"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-500 hover:text-white transition-colors"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white transition-colors"
                                 >
-                                    {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
                             </div>
-                            {errors.password && <p className="text-red-400 text-xs ml-1 pt-1 animate-fadeIn">{errors.password}</p>}
+                            {errors.password && <p className="text-red-400 text-[10px] ml-1">{errors.password}</p>}
                         </div>
 
-                        {/* Login Button - Prominent & Premium */}
+                        {/* Submit Button */}
                         <button
                             type="submit"
                             disabled={loading}
-                            className="relative w-full py-4.5 overflow-hidden font-extrabold text-white transition-all duration-300 bg-blue-600 rounded-2xl hover:bg-blue-500 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_10px_20px_-5px_rgba(37,99,235,0.4)]"
+                            className="w-full bg-white text-black font-bold py-4 rounded-2xl hover:bg-gray-200 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 shadow-xl shadow-white/5"
                         >
-                            {/* Subtle shining light effect on button hover */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-shine pointer-events-none" />
-
-                            <span className="flex items-center justify-center gap-2.5 text-base">
-                                {loading ? (
-                                    <Loader2 className="animate-spin" size={20} />
-                                ) : (
-                                    <>Sign In to Chat</>
-                                )}
-                            </span>
+                            {loading ? (
+                                <Loader2 className="animate-spin" size={20} />
+                            ) : (
+                                <>
+                                    Log In <ArrowRight size={18} />
+                                </>
+                            )}
                         </button>
                     </form>
 
-                    {/* Footer Sign Up Link */}
-                    <div className="mt-10 text-center">
-                        <p className="text-sm text-slate-500">
-                            New here?{" "}
-                            <button
+                    {/* Footer */}
+                    <div className="mt-8 text-center">
+                        <p className="text-gray-500 text-sm">
+                            Don't have an account?{" "}
+                            <span
                                 onClick={() => router.push("/singupp")}
-                                className="font-bold text-blue-400 hover:text-blue-300 transition-colors underline-offset-4 hover:underline"
+                                className="text-white font-semibold cursor-pointer hover:underline underline-offset-4"
                             >
-                                Create an account
-                            </button>
+                                Sign Up
+                            </span>
                         </p>
                     </div>
                 </div>
 
-                {/* Dynamic decorative elements around the card (visible on larger screens) */}
-                <div className="absolute -top-10 -right-10 w-20 h-20 bg-blue-500/10 rounded-full blur-3xl opacity-0 lg:opacity-100" />
-                <div className="absolute -bottom-10 -left-10 w-20 h-20 bg-purple-500/10 rounded-full blur-3xl opacity-0 lg:opacity-100" />
-            </div>
+                {/* Bottom Trust Badge */}
+                <div className="mt-8 flex items-center justify-center gap-2 opacity-30 grayscale hover:grayscale-0 transition-all duration-500">
+                    <div className="h-[1px] w-8 bg-gray-500" />
+                    <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Secure Encryption Active</span>
+                    <div className="h-[1px] w-8 bg-gray-500" />
+                </div>
+            </motion.div>
         </div>
     );
 }
